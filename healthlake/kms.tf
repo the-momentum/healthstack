@@ -45,7 +45,7 @@ resource "aws_kms_key" "datastore" {
 }
 
 resource "aws_kms_key" "s3" {
-  description         = "This key encrypts FHIR datastore"
+  description         = "This key encrypts S3 bucket hosting FHIR data"
   enable_key_rotation = true
   policy = jsonencode({
     Version = "2012-10-17"
