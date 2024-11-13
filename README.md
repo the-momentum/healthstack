@@ -10,7 +10,7 @@
     <a href="https://themomentum.ai">
     <img src=https://img.shields.io/badge/Check%20Momentum-1f6ff9.svg alt="Check">
   </a>
-  <a href="LICENSE.md">
+  <a href="LICENSE">
     <img src="https://img.shields.io/badge/License-MIT-636f5a.svg?longCache=true" alt="MIT License">
   </a>
 </div>
