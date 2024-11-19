@@ -1,6 +1,3 @@
-data "aws_region" "current" {}
-data "aws_caller_identity" "current" {}
-
 resource "aws_iam_role" "healthlake" {
   name = var.healthlake_role_name
 
@@ -115,4 +112,27 @@ resource "aws_s3_bucket_policy" "access_logs" {
       }
     ]
   })
+}
+
+resource "aws_iam_role" "healthlake_service_role" {
+  name        = "healthlake-service-role"
+  description = "Service role for AWS HealthLake FHIR operations"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "healthlake.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "healthlake_policy" {
+  role       = aws_iam_role.healthlake_service_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonHealthLakeFullAccess"
 }
