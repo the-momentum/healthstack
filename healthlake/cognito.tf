@@ -1,5 +1,3 @@
-# cognito.tf
-
 resource "aws_cognito_user_pool" "main" {
   count = var.smart_on_fhir ? 1 : 0
 
@@ -111,19 +109,11 @@ resource "aws_cognito_user_pool_client" "client" {
 
 
   prevent_user_existence_errors        = "ENABLED"
-  allowed_oauth_flows                  = ["code"]
+  allowed_oauth_flows                  = [var.grant_type]
   allowed_oauth_flows_user_pool_client = true
 
 
-  allowed_oauth_scopes = [
-    "openid",
-    "profile",
-    "email",
-    "phone",
-    "launch/patient",
-    "system/*.*",
-    "patient/*.read"
-  ]
+  allowed_oauth_scopes = var.grant_type == "code" ? local.auth_code_scopes : local.client_credentials_scopes
 
   callback_urls = var.cognito_callback_urls
   logout_urls   = var.cognito_logout_urls
