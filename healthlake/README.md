@@ -88,6 +88,28 @@ HealthLake permissions (can be adjusted for read-only access, for example):
 }
 ```
 
+## SMART on FHIR testing
+
+If you want to test SMART you can use Postman to do so.
+
+Here is what you need to do:
+1. Open postman and check "Authorization" tab (under URL placeholder)
+2. Under "Configure New Token" fill credentials
+    - Token Name - ex. "token"
+    - Grant Type - Authorization Code
+    - Callback URL - for testing https://localhost
+    - Auth URL - ex. "https://smart.auth.us-east-1.amazoncognito.com/oauth2/authorize"
+    - Access Token URL - ex. "https://smart.auth.us-east-1.amazoncognito.com/oauth2/token"
+    - Client ID - you can get it from Cognito app
+    - Client Secret -you can get it from Cognito app
+    - Scope - ex. openid launch/patient system/.
+    - State - ex. 1231234
+3. Click "Get New Access Token button"
+4. Window should pop up in postman, fill up user credentials
+5. You should get JWT token, click button to use it
+6. Make a request
+
+
 ## Example client
 
 The AWS SDK provides administrative capabilities for HealthLake, but to interact with the FHIR REST API, you need to create an HTTP request and sign it in a specific way to ensure authorization.
@@ -120,6 +142,8 @@ conn.get
 
 ### Common problems
 
+#### Signing request
+
 You may encounter the following issue with signing:
 
 ```
@@ -135,6 +159,7 @@ https://healthlake.us-east-1.amazonaws.com/datastore/#{datastore_id}/r4/
 # But made this request:
 https://healthlake.us-east-1.amazonaws.com/datastore/#{datastore_id}/r4/Patient
 ```
+
 
 ## SMART on FHIR with Healthlake
 
