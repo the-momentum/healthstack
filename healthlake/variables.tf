@@ -176,3 +176,15 @@ variable "cognito_test_users" {
   }))
   default = []
 }
+
+variable "grant_type" {
+  type        = string
+  description = "OAuth grant type - either 'authorization_code' or 'client_credentials'"
+  validation {
+    condition     = contains(["code", "client_credentials"], var.grant_type)
+    error_message = "grant_type must be either 'authorization_code' or 'client_credentials'"
+  }
+
+  default = "authorization_code"
+}
+
