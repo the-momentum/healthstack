@@ -12,7 +12,7 @@ This module provides a solution for a specific problem but can be adapted to sui
 
 ```tf
 module "s3" {
-  source                 = "github.com/TheMomentumAI/healthstack.git//aws-s3/module"
+  source                 = "github.com/momentum-ai/healthstack.git//aws-s3/module"
   bucket_name            = "test-bucket"
   logs_bucket_name       = "test-logs-bucket"
   kms_encryption_enabled = false

@@ -19,7 +19,7 @@ You can initialize FHIR repository with Synthea preloaded data:
 
 ```tf
 module "healthlake" {
-  source = "./healthlake"
+  source = "github.com/momentum-ai/healthstack.git//aws-healthlake/module"
 
   datastore_name    = "fhir-sandbox"
   kms_admin_iam_arn = "arn:aws:iam::123:user/user"
