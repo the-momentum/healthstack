@@ -1,5 +1,3 @@
-# HealthStack
-
 <div align="center">
   <img src="https://cdn.prod.website-files.com/66a1237564b8afdc9767dd3d/66df7b326efdddf8c1af9dbb_Momentum%20Logo.svg" height="64">
 
@@ -8,7 +6,6 @@
   [![MIT License](https://img.shields.io/badge/License-MIT-636f5a.svg?longCache=true)](LICENSE)
 </div>
 
-🏛️ Build Compliant Infrastructure, Fast
 
 ## Overview
 
