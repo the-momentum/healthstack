@@ -13,6 +13,7 @@ resource "tls_self_signed_cert" "ca_cert" {
   subject {
     common_name  = "VPN Root CA"
     organization = var.organization_name
+    country      = "US" # Added for compliance
   }
 
   validity_period_hours = 87600 # 10 years
@@ -20,7 +21,9 @@ resource "tls_self_signed_cert" "ca_cert" {
 
   allowed_uses = [
     "cert_signing",
-    "crl_signing"
+    "crl_signing",
+    "digital_signature",
+    "key_encipherment"
   ]
 }
 
@@ -39,6 +42,7 @@ resource "tls_cert_request" "vpn_csr" {
   subject {
     common_name  = var.vpn_domain
     organization = var.organization_name
+    country      = "US"
   }
 }
 
@@ -74,6 +78,7 @@ resource "tls_cert_request" "client_csr" {
   subject {
     common_name  = "client.${var.vpn_domain}"
     organization = var.organization_name
+    country      = "US"
   }
 }
 
@@ -103,34 +108,30 @@ resource "aws_acm_certificate" "vpn_cert" {
   certificate_body  = tls_locally_signed_cert.vpn_cert.cert_pem
   certificate_chain = tls_self_signed_cert.ca_cert.cert_pem
 
-  tags = {
-    Name = "vpn-certificate"
-  }
+  tags = var.tags
 }
 
 resource "aws_acm_certificate" "ca_cert" {
   private_key      = tls_private_key.ca_key.private_key_pem
   certificate_body = tls_self_signed_cert.ca_cert.cert_pem
 
-  tags = {
-    Name = "vpn-ca-certificate"
-  }
+  tags = var.tags
 }
 
-################################################################################
-# Export Certificates to Local
-################################################################################
+# ################################################################################
+# # Export Certificates to Local
+# ################################################################################
 
-resource "local_file" "client_cert" {
-  content  = tls_locally_signed_cert.client_cert.cert_pem
-  filename = "${path.module}/certs/client.crt"
-}
+# resource "local_file" "client_cert" {
+#   content  = tls_locally_signed_cert.client_cert.cert_pem
+#   filename = "${path.module}/certs/client.crt"
+# }
 
-resource "local_file" "client_key" {
-  content         = tls_private_key.client_key.private_key_pem
-  filename        = "${path.module}/certs/client.key"
-  file_permission = "0600"
-}
+# resource "local_file" "client_key" {
+#   content         = tls_private_key.client_key.private_key_pem
+#   filename        = "${path.module}/certs/client.key"
+#   file_permission = "0600"
+# }
 
 ################################################################################
 # Create VPN Endpoint #
@@ -145,7 +146,7 @@ resource "aws_security_group" "vpn" {
     from_port   = 443
     to_port     = 443
     protocol    = "udp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = var.allowed_cidr_blocks
   }
 
   egress {
@@ -154,6 +155,8 @@ resource "aws_security_group" "vpn" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = var.tags
 }
 
 resource "aws_ec2_client_vpn_endpoint" "vpn" {
@@ -161,7 +164,7 @@ resource "aws_ec2_client_vpn_endpoint" "vpn" {
   server_certificate_arn = aws_acm_certificate.vpn_cert.arn
   client_cidr_block      = var.client_cidr_block
   vpc_id                 = var.vpc_id
-  split_tunnel           = true
+  split_tunnel           = var.split_tunnel
 
   authentication_options {
     type                       = "certificate-authentication"
@@ -172,13 +175,29 @@ resource "aws_ec2_client_vpn_endpoint" "vpn" {
   security_group_ids = [aws_security_group.vpn.id]
 
   connection_log_options {
-    enabled = false
+    enabled               = true
+    cloudwatch_log_group  = aws_cloudwatch_log_group.vpn_logs.name
+    cloudwatch_log_stream = aws_cloudwatch_log_stream.vpn_logs.name
   }
+
+  dns_servers = ["169.254.169.253"]
+
+  session_timeout_hours = 8
+
+  client_login_banner_options {
+    enabled     = true
+    banner_text = "This VPN is for authorized users only. All activities may be monitored and recorded."
+  }
+
+  tags = merge(var.tags, {
+    Name = "client-vpn-${var.vpn_domain}"
+  })
 }
 
 resource "aws_ec2_client_vpn_network_association" "vpn_subnet" {
+  for_each               = toset(var.subnet_ids)
   client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.vpn.id
-  subnet_id              = var.subnet_id
+  subnet_id              = each.value
 }
 
 resource "aws_ec2_client_vpn_authorization_rule" "vpn_auth_rule" {
@@ -186,6 +205,27 @@ resource "aws_ec2_client_vpn_authorization_rule" "vpn_auth_rule" {
   target_network_cidr    = var.target_network_cidr
   authorize_all_groups   = true
 }
+
+################################################################################
+# Logging
+################################################################################
+
+resource "aws_cloudwatch_log_group" "vpn_logs" {
+  # encrypted by default
+  name              = "/aws/vpn/${var.vpn_domain}"
+  retention_in_days = 2192 # 6 years
+
+  tags = var.tags
+}
+
+resource "aws_cloudwatch_log_stream" "vpn_logs" {
+  name           = "vpn-connection-logs"
+  log_group_name = aws_cloudwatch_log_group.vpn_logs.name
+}
+
+################################################################################
+# Generate Client VPN Config File
+################################################################################
 
 data "aws_ec2_client_vpn_endpoint" "selected" {
   client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.vpn.id
@@ -195,12 +235,8 @@ data "aws_ec2_client_vpn_endpoint" "selected" {
   ]
 }
 
-################################################################################
-# Generate Client VPN Config File
-################################################################################
-
 resource "local_file" "vpn_config" {
-  filename = "${path.module}/client.ovpn"
+  filename = "${path.root}/client.ovpn"
   content  = <<-EOT
 client
 dev tun
