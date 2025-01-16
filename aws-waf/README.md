@@ -13,7 +13,7 @@ Example usage:
 
 ```terraform
 module "waf" {
-  source = "github.com/momentum-ai/healthstack.git//aws-waf/module"
+  source = "github.com/the-momentum/healthstack.git//aws-waf/module"
 
   waf_enabled                = true
   allow_ips_rule_enabled     = false
