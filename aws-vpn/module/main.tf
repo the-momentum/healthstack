@@ -28,7 +28,7 @@ resource "tls_self_signed_cert" "ca_cert" {
 }
 
 ################################################################################
-# VPN Gateway Key and Certificate
+# VPN Server Key and Certificate
 ################################################################################
 
 resource "tls_private_key" "vpn_key" {
@@ -118,23 +118,8 @@ resource "aws_acm_certificate" "ca_cert" {
   tags = var.tags
 }
 
-# ################################################################################
-# # Export Certificates to Local
-# ################################################################################
-
-# resource "local_file" "client_cert" {
-#   content  = tls_locally_signed_cert.client_cert.cert_pem
-#   filename = "${path.module}/certs/client.crt"
-# }
-
-# resource "local_file" "client_key" {
-#   content         = tls_private_key.client_key.private_key_pem
-#   filename        = "${path.module}/certs/client.key"
-#   file_permission = "0600"
-# }
-
 ################################################################################
-# Create VPN Endpoint #
+# Create Client VPN Endpoint #
 ################################################################################
 
 resource "aws_security_group" "vpn" {
