@@ -22,6 +22,7 @@ resource "aws_cloudwatch_log_metric_filter" "iam_actions" {
   ($.eventName = DeleteGroup) ||
   ($.eventName = DeleteGroupPolicy) ||
   ($.eventName = DeleteRole) ||
+  ($.eventName = CreateGroup) ||
   ($.eventName = DeleteRolePolicy) ||
   ($.eventName = DeleteUser) ||
   ($.eventName = DeleteUserPolicy) ||
@@ -103,60 +104,6 @@ EOF
   }
 }
 
-# Database Access Monitoring #
-resource "aws_cloudwatch_log_metric_filter" "database_access" {
-  name           = "database-access-patterns"
-  pattern        = "{ $.eventSource = rds* || $.eventSource = dynamodb* }"
-  log_group_name = aws_cloudwatch_log_group.this.name
-
-  metric_transformation {
-    name      = "DatabaseAccessCount"
-    namespace = "HIPAAMetrics"
-    value     = "1"
-  }
-}
-
-# PHI Storage Changes #
-# locals {
-#   rds_arns = [for db in var.rds_instance_names : "arn:aws:rds:*:*:db:${db}"]
-#   bucket_arns = [for bucket in var.s3_bucket_names : "arn:aws:s3:::${bucket}/*"]
-# }
-
-# resource "aws_cloudwatch_log_metric_filter" "data_storage_changes" {
-#   name    = "data-storage-changes"
-#   pattern = <<EOF
-# {
-#   (
-#     ($.eventSource = rds.amazonaws.com) &&
-#     (
-#       ($.eventName = CreateDBInstance && $.requestParameters.dBInstanceIdentifier IN ${jsonencode(var.rds_instance_names)}) ||
-#       ($.eventName = DeleteDBInstance && $.requestParameters.dBInstanceIdentifier IN ${jsonencode(var.rds_instance_names)}) ||
-#       ($.eventName = ModifyDBInstance && $.requestParameters.dBInstanceIdentifier IN ${jsonencode(var.rds_instance_names)}) ||
-#       ($.eventName = StartDBInstance && $.requestParameters.dBInstanceIdentifier IN ${jsonencode(var.rds_instance_names)}) ||
-#       ($.eventName = StopDBInstance && $.requestParameters.dBInstanceIdentifier IN ${jsonencode(var.rds_instance_names)})
-#     )
-#   ) ||
-#   (
-#     ($.eventSource = s3.amazonaws.com) &&
-#     (
-#       ($.eventName = CreateBucket && $.requestParameters.bucketName IN ${jsonencode(var.s3_bucket_names)}) ||
-#       ($.eventName = DeleteBucket && $.requestParameters.bucketName IN ${jsonencode(var.s3_bucket_names)}) ||
-#       ($.eventName = PutObject && $.requestParameters.bucketName IN ${jsonencode(var.s3_bucket_names)}) ||
-#       ($.eventName = DeleteObject && $.requestParameters.bucketName IN ${jsonencode(var.s3_bucket_names)})
-#     )
-#   )t
-# }
-# EOF
-
-#   log_group_name = aws_cloudwatch_log_group.this.name
-
-#   metric_transformation {
-#     name      = "DataStorageChanges"
-#     namespace = "DataSecurityMetrics"
-#     value     = "1"
-#   }
-# }
-
 # Network Configuration Changes #
 resource "aws_cloudwatch_log_metric_filter" "network_changes" {
   name           = "network-changes"
@@ -181,10 +128,11 @@ resource "aws_sns_topic" "alerts" {
 }
 
 resource "aws_sns_topic_subscription" "alerts_email" {
-  count     = length(var.alert_emails)
+  for_each = toset(var.alert_emails)
+
   topic_arn = aws_sns_topic.alerts.arn
   protocol  = "email"
-  endpoint  = var.alert_emails[count.index]
+  endpoint  = each.value
 }
 
 ################################################################################

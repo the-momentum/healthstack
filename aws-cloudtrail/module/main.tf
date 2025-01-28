@@ -68,6 +68,20 @@ data "aws_iam_policy_document" "kms" {
       values   = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"]
     }
   }
+
+  statement {
+    sid    = "Allow CloudWatch Alarm"
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["cloudwatch.amazonaws.com"]
+    }
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey"
+    ]
+    resources = ["*"]
+  }
 }
 
 ################################################################################
@@ -123,6 +137,28 @@ resource "aws_s3_bucket_policy" "this" {
       }
     ]
   })
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "this" {
+  bucket = aws_s3_bucket.this.id
+
+  rule {
+    id     = "LogExpiration"
+    status = "Enabled"
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 2
+    }
+
+    expiration {
+      days = 2190 # 6 years is a compliance requirement
+    }
+
+    transition {
+      days          = 60
+      storage_class = "GLACIER"
+    }
+  }
 }
 
 ################################################################################
