@@ -6,6 +6,57 @@ locals {
 }
 
 ################################################################################
+# CloudTrail
+################################################################################
+
+resource "aws_cloudtrail" "this" {
+  name                          = var.name
+  is_multi_region_trail         = true
+  include_global_service_events = true
+  enable_log_file_validation    = true
+
+  kms_key_id     = local.kms_key_arn
+  s3_bucket_name = aws_s3_bucket.this.id
+
+  cloud_watch_logs_group_arn = "${aws_cloudwatch_log_group.this.arn}:*"
+  cloud_watch_logs_role_arn  = aws_iam_role.cloudtrail.arn
+
+  depends_on = [aws_s3_bucket_policy.this]
+  tags       = var.tags
+}
+
+# IAM Role for CloudTrail
+resource "aws_iam_role" "cloudtrail" {
+  name = "cloudtrail-${var.name}"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = {
+        Service = "cloudtrail.amazonaws.com"
+      }
+    }]
+  })
+}
+
+resource "aws_iam_role_policy" "cloudtrail" {
+  name = "cloudtrail-${var.name}"
+  role = aws_iam_role.cloudtrail.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Action = [
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ]
+      Resource = "${aws_cloudwatch_log_group.this.arn}:*"
+    }]
+  })
+}
+
+################################################################################
 # KMS Key
 ################################################################################
 
@@ -151,7 +202,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
     }
 
     expiration {
-      days = 2190 # 6 years is a compliance requirement
+      days = var.log_retention_days
     }
 
     transition {
@@ -159,54 +210,4 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
       storage_class = "GLACIER"
     }
   }
-}
-
-################################################################################
-# CloudTrail
-################################################################################
-
-resource "aws_cloudtrail" "this" {
-  name                          = var.name
-  is_multi_region_trail         = true
-  include_global_service_events = true
-  enable_log_file_validation    = true
-  kms_key_id                    = local.kms_key_arn
-  s3_bucket_name                = aws_s3_bucket.this.id
-
-  cloud_watch_logs_group_arn = "${aws_cloudwatch_log_group.this.arn}:*"
-  cloud_watch_logs_role_arn  = aws_iam_role.cloudtrail.arn
-
-  depends_on = [aws_s3_bucket_policy.this]
-  tags       = var.tags
-}
-
-# IAM Role for CloudTrail
-resource "aws_iam_role" "cloudtrail" {
-  name = "cloudtrail-${var.name}"
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Action = "sts:AssumeRole"
-      Effect = "Allow"
-      Principal = {
-        Service = "cloudtrail.amazonaws.com"
-      }
-    }]
-  })
-}
-
-resource "aws_iam_role_policy" "cloudtrail" {
-  name = "cloudtrail-${var.name}"
-  role = aws_iam_role.cloudtrail.id
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect = "Allow"
-      Action = [
-        "logs:CreateLogStream",
-        "logs:PutLogEvents"
-      ]
-      Resource = "${aws_cloudwatch_log_group.this.arn}:*"
-    }]
-  })
 }

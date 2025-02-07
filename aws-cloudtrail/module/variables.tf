@@ -18,7 +18,7 @@ variable "alert_emails" {
 variable "log_retention_days" {
   description = "Number of days to retain CloudWatch logs"
   type        = number
-  default     = 2192 # 6 years for HIPAA compliance
+  default     = 180
 }
 
 variable "tags" {
