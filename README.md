@@ -27,11 +27,9 @@ Currently available modules:
 - ✅ AWS S3: Secure storage configuration with encryption and access controls
 - ✅ AWS KMS: Key Management Service for data encryption and key management
 - ✅ AWS VPN: Secure VPN connection to your VPCs from anywhere
+- ✅ AWS CloudTrail and AWS CloudWatch: for comprehensive audit logging, monitoring and alerting
 
 Coming soon:
-
-- AWS CloudTrail for comprehensive audit logging
-- AWS CloudWatch for monitoring and alerting
 - AWS Bedrock for AI agents and machine learning
 - AWS RDS for managed databases
 - AWS Backup for automated backups
