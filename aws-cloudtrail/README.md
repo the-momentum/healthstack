@@ -6,10 +6,10 @@ It includes CloudWatch Logs integration, KMS encryption, S3 bucket configuration
 ## Implementated Features
 
 - CloudTrail logs are encrypted using KMS and stored in a dedicated S3 bucket
-- Logs are retained for 6 years (2190 days) to meet compliance requirements
+- CloudTrail logs are stored in an S3 bucket with versioning enabled for data protection and audit history
+- Variable retention period depending on requirements
 - After 60 days, logs are automatically transitioned to Glacier storage for cost optimization
 - CloudWatch Logs and SNS are used for monitoring and alerting
-
 
 ## Security Event Monitoring and Alerting
 
@@ -19,10 +19,6 @@ The module monitors several critical security events:
 - Root account usage
 - Security group modifications
 - Network configuration changes (VPC, NACL)
-
-Planned to add:
-- S3 bucket monitoring - policies, public access, etc.
--
 
 ## Example Usage
 
