@@ -18,6 +18,7 @@ The module monitors several critical security events:
 - Failed login attempts
 - Root account usage
 - Security group modifications
+- Failed backup jobs
 - Network configuration changes (VPC, NACL)
 
 ## Example Usage
@@ -42,6 +43,76 @@ module "cloudtrail" {
   }
 }
 ```
+
+## Logs lookup
+
+Logs can be viewed in the CloudWatch Logs console or queried with CLI.
+
+### AWS Console
+
+In console, navigate to CloudTrail and select Event History. Then apply filters like:
+- Event name + DeleteDBSecurityGroup
+- Event source + rds.amazonaws.com
+- Resource type + AWS::S3::Bucket
+- User agent + IAM user or role name
+
+### CLI
+
+Here are some useful queries:
+
+```bash
+# Get all events from RDS from specific time range
+aws cloudtrail lookup-events \
+  --lookup-attributes AttributeKey=EventSource,AttributeValue=rds.amazonaws.com \
+  --query 'Events[?EventName == `CreateDBInstance` ||
+                  EventName == `DeleteDBInstance` ||
+                  EventName == `ModifyDBInstance` ||
+                  EventName == `RebootDBInstance` ||
+                  EventName == `RestoreDBInstanceFromDBSnapshot` ||
+                  EventName == `StartDBInstance` ||
+                  EventName == `StopDBInstance`]' \
+  --start-time 2024-01-01 \
+  --end-time 2025-02-07
+
+# Get all events from RDS from specific time range and format as JSON
+aws cloudtrail lookup-events \
+  --lookup-attributes AttributeKey=EventSource,AttributeValue=rds.amazonaws.com \
+  --start-time 2024-01-01 \
+  --end-time 2025-02-07 | \
+  jq '.Events[] | {
+    EventName: .EventName,
+    EventTime: .EventTime,
+    Username: .Username,
+    IP: .CloudTrailEvent | fromjson | .sourceIPAddress,
+    UserAgent: .CloudTrailEvent | fromjson | .userAgent
+  }'
+
+# Filter for events related to a specific RDS instance
+aws cloudtrail lookup-events \
+  --lookup-attributes AttributeKey=ResourceName,AttributeValue=database-1 \
+  --start-time 2025-01-01 \
+  --end-time 2025-02-07
+
+# Get all events from S3 and RDS in the last 24 hours
+aws cloudtrail lookup-events \
+  --start-time $(date -v-24H -u "+%Y-%m-%dT%H:%M:%SZ") \
+  --query 'Events[?EventSource==`s3.amazonaws.com` || EventSource==`rds.amazonaws.com`]' | \
+  jq '.[] | select(.EventName | contains("Get") or contains("Put") or contains("Delete")) | {
+    EventTime: .EventTime,
+    Service: .EventSource,
+    Action: .EventName,
+    User: .Username,
+    IP: (.CloudTrailEvent | fromjson).sourceIPAddress
+  }'
+
+
+```
+
+Cross-Platform Note:
+- for Linux systems, use `-d '24 hours ago'` syntax
+- for macOS systems, use `-v-24H` syntax
+- alternatively, use explicit `--start-time` and `--end-time` which works on both systems
+
 
 ## Requirements
 

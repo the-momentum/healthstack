@@ -117,6 +117,32 @@ resource "aws_cloudwatch_log_metric_filter" "network_changes" {
   }
 }
 
+resource "aws_cloudwatch_log_metric_filter" "backup_failures" {
+  name           = "backup-failures"
+  log_group_name = aws_cloudwatch_log_group.this.name
+
+  pattern = <<EOF
+{ $.eventSource = "backup.amazonaws.com" &&
+  (
+    ($.eventName = "BackupJobCompleted" && $.serviceEventDetails.state != "COMPLETED") ||
+    ($.eventName = "RestoreJobCompleted" && $.serviceEventDetails.state != "COMPLETED") ||
+    ($.eventName = "CopyJobCompleted" && $.serviceEventDetails.state != "COMPLETED") ||
+    ($.eventName = "ReportJobCompleted" && $.serviceEventDetails.state != "COMPLETED") ||
+    ($.eventName = "DeleteBackupSelection") ||
+    ($.eventName = "StartBackupJob" && $.errorCode = "*") ||
+    ($.eventName = "StartRestoreJob" && $.errorCode = "*") ||
+    ($.eventName = "InvalidOrganizationBackupPlan")
+  )
+}
+EOF
+
+  metric_transformation {
+    name      = "BackupFailures"
+    namespace = "CloudTrailMetrics"
+    value     = "1"
+  }
+}
+
 # ################################################################################
 # SNS Topic for Alerts
 # ################################################################################
@@ -210,6 +236,22 @@ resource "aws_cloudwatch_metric_alarm" "network_changes_alarm" {
   statistic           = "Sum"
   threshold           = "0"
   alarm_description   = "Network configuration changes detected"
+  alarm_actions       = [aws_sns_topic.alerts.arn]
+  tags                = var.tags
+}
+
+
+# Backup Failures Alarm #
+resource "aws_cloudwatch_metric_alarm" "backup_failures_alarm" {
+  alarm_name          = "${var.name}-backup-failures"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = "1"
+  metric_name         = "BackupFailures"
+  namespace           = "CloudTrailMetrics"
+  period              = "300"
+  statistic           = "Sum"
+  threshold           = "0"
+  alarm_description   = "AWS Backup failures detected"
   alarm_actions       = [aws_sns_topic.alerts.arn]
   tags                = var.tags
 }
