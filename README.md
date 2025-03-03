@@ -1,42 +1,43 @@
 <div align="center">
-  <img src="https://cdn.prod.website-files.com/66a1237564b8afdc9767dd3d/66df7b326efdddf8c1af9dbb_Momentum%20Logo.svg" height="64">
+  <img src="https://cdn.prod.website-files.com/66a1237564b8afdc9767dd3d/66df7b326efdddf8c1af9dbb_Momentum%20Logo.svg" height="80">
+  <h1>HealthStack</h1>
+  <p><strong>HIPAA-Compliant Infrastructure as Code for Healthcare on AWS</strong></p>
 
-  [![Contact us](https://img.shields.io/badge/Contact%20us-AFF476.svg)](mailto:hello@themomentum.ai?subject=Terraform%20Modules)
-  [![Check Momentum](https://img.shields.io/badge/Check%20Momentum-1f6ff9.svg)](https://themomentum.ai)
-  [![MIT License](https://img.shields.io/badge/License-MIT-636f5a.svg?longCache=true)](LICENSE)
+  [![Contact us](https://img.shields.io/badge/Contact%20us-AFF476.svg?style=for-the-badge&logo=mail&logoColor=black)](mailto:hello@themomentum.ai?subject=Terraform%20Modules)
+  [![Visit Momentum](https://img.shields.io/badge/Visit%20Momentum-1f6ff9.svg?style=for-the-badge&logo=safari&logoColor=white)](https://themomentum.ai)
+  [![MIT License](https://img.shields.io/badge/License-MIT-636f5a.svg?style=for-the-badge&logo=opensourceinitiative&logoColor=white)](LICENSE)
 </div>
 
+## 🏥 Overview
 
-## Overview
+**HealthStack** provides battle-tested Terraform modules for building secure and compliant healthcare infrastructure on AWS. These modules help healthcare organizations deploy HIPAA-compliant environments with confidence, focusing on security, scalability, and compliance from day one.
 
-HealthStack provides ready-to-use Terraform modules for building secure and compliant healthcare infrastructure on AWS. Our modules help healthcare companies deploy HIPAA-compliant infrastructure quickly and reliably.
+## ✨ Key Features
 
-### Key Features
+- **🛡️ Security-First Design**: Pre-configured security settings aligned with healthcare compliance requirements
+- **🧩 Modular Architecture**: Mix and match components for flexible infrastructure deployment
+- **📚 Comprehensive Documentation**: Detailed guidance and examples for each module
+- **🔄 Continuous Updates**: Regular security patches and compliance enhancements
+- **⚡ Rapid Deployment**: Deploy compliant infrastructure in minutes, not weeks
 
-- Pre-configured security settings aligned with healthcare compliance requirements
-- Modular design for flexible infrastructure deployment
-- Detailed documentation for each module
-- Regular security updates and maintenance
+## 📦 Available Modules
 
-## Available Modules
+| Module | Description | Status |
+|--------|-------------|--------|
+| **[AWS WAF](./aws-waf)** | Web Application Firewall with healthcare-specific rule sets | ✅ Available |
+| **[AWS HealthLake](./aws-healthlake)** | Managed FHIR service with secure storage and access controls | ✅ Available |
+| **[AWS S3](./aws-s3)** | Secure storage with encryption, versioning and lifecycle policies | ✅ Available |
+| **[AWS KMS](./aws-kms)** | Key Management Service for data encryption and key rotation | ✅ Available |
+| **[AWS VPN](./aws-vpn)** | Secure VPN connection with multi-factor authentication | ✅ Available |
+| **[AWS CloudTrail & CloudWatch](./aws-audit)** | Comprehensive audit logging, monitoring and alerting | ✅ Available |
+| **AWS VPC** | Multi-AZ VPC with public/private subnets, flow logs, and VPC endpoints | 🔜 Coming Soon |
+| **AWS Bedrock** | AI agents and machine learning with guardrails | 🔜 Coming Soon |
+| **AWS RDS** | Managed databases with encryption and backup | 🔜 Coming Soon |
+| **AWS Backup** | Automated backup and disaster recovery | 🔜 Coming Soon |
 
-Currently available modules:
+## 🚀 Quick Start
 
-- ✅ AWS WAF: Web Application Firewall configuration for protecting healthcare applications
-- ✅ AWS HealthLake: Managed FHIR service setup for healthcare data management
-- ✅ AWS S3: Secure storage configuration with encryption and access controls
-- ✅ AWS KMS: Key Management Service for data encryption and key management
-- ✅ AWS VPN: Secure VPN connection to your VPCs from anywhere
-- ✅ AWS CloudTrail and AWS CloudWatch: for comprehensive audit logging, monitoring and alerting
-
-Coming soon:
-- AWS Bedrock for AI agents and machine learning
-- AWS RDS for managed databases
-- AWS Backup for automated backups
-
-## Quick Start
-
-Each module includes detailed documentation in its respective folder. Here's a simple example of setting up a FHIR repository:
+Each module includes step-by-step documentation in its respective folder. Here's a simple example of setting up a FHIR repository:
 
 ```terraform
 module "healthlake" {
@@ -51,48 +52,54 @@ module "healthlake" {
 }
 ```
 
-## Security
+## 🔒 Security & Compliance
 
-- All modules follow AWS security best practices
-- Default configurations prioritize security
-- Built-in encryption and access controls
+- **HIPAA Alignment**: Modules designed with HIPAA Technical Safeguards in mind
+- **Encryption Everywhere**: All data encrypted at rest and in transit by default
+- **Least Privilege Access**: Fine-grained IAM policies limiting access to protected health information
+- **Audit Trails**: Comprehensive logging for all infrastructure activities
+- **Regular Security Scans**: Modules continuously tested against security benchmarks
 
-## Development Status
+## 🛠️ Development Status
 
-We actively maintain and improve these modules. Our current focus:
-- Adding more security-focused modules
-- Implementing automated code scanning
-- Expanding documentation and examples
-- Adding compliance validation tools
+We actively maintain and enhance these modules based on emerging security standards and AWS best practices. Current focus areas:
 
-## Contributing
+- Adding SOC2 compliance validation tools
+- Adding more modules
+- Expanding support for healthcare-specific workloads
+- Implementing automated security scanning pipelines
 
-We welcome contributions! Here's how you can help:
+## 👥 Contributing
+
+We welcome contributions from the healthcare and security communities! Here's how you can help:
 
 1. Fork the repository
-2. Create your feature branch
-3. Commit your changes
-4. Push to the branch
+2. Create your feature branch (`git checkout -b feature/amazing-enhancement`)
+3. Commit your changes (`git commit -m 'Add some amazing enhancement'`)
+4. Push to the branch (`git push origin feature/amazing-enhancement`)
 5. Open a Pull Request
 
-Please review our contribution guidelines before submitting changes.
+Please review our [contribution guidelines](CONTRIBUTING.md) before submitting changes.
 
-## Support
+## 🙋‍♀️ Support
 
-- Review the documentation in each module's README
-- Open an issue for bug reports or feature requests
-- Contact us at hello@themomentum.ai for direct support
+- **Documentation**: Review the detailed README in each module directory
+- **Issues**: Open an issue for bug reports or feature requests
+- **Direct Support**: Contact us at [hello@themomentum.ai](mailto:hello@themomentum.ai) for personalized assistance
+- **Office Hours**: Join our monthly virtual office hours (schedule on our website)
 
-## Contributors
+## 👨‍💻 Contributors
 
 <a href="https://github.com/TheMomentumAI/healthstack/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=TheMomentumAI/healthstack" />
 </a>
 
-## License
+## 📄 License
 
-HealthStack is available under the MIT License.
+HealthStack is available under the [MIT License](LICENSE).
 
 ---
 
-*Built with ❤️ by [Momentum](https://themomentum.ai)*
+<div align="center">
+  <p><em>Built with ❤️ by <a href="https://themomentum.ai">Momentum</a> • Helping healthcare innovate with confidence</em></p>
+</div>
