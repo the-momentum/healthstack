@@ -3,9 +3,29 @@
 # Enables secure SSH access to instances in private subnets without bastion hosts
 #===============================================================================
 resource "aws_ec2_instance_connect_endpoint" "this" {
-  count     = var.create_eic_endpoint && var.private_subnets_enabled ? 1 : 0
+  count = var.create_eic_endpoint && var.private_subnets_enabled ? 1 : 0
 
-  subnet_id = aws_subnet.private[0].id
+  subnet_id          = aws_subnet.private[0].id
+  security_group_ids = [aws_security_group.eic_endpoint[0].id]
+
+  preserve_client_ip = true
+}
+
+resource "aws_security_group" "eic_endpoint" {
+  count = var.create_eic_endpoint && var.private_subnets_enabled ? 1 : 0
+
+  name        = "${var.vpc_name}-eic-endpoint-sg"
+  description = "Security group for EC2 Instance Connect Endpoint"
+  vpc_id      = aws_vpc.this.id
+
+  # EC2 Instance Connect Endpoint needs outbound access to SSH to instances
+  egress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = [aws_vpc.this.cidr_block]
+    description = "Allow SSH to instances within VPC"
+  }
 }
 
 #===============================================================================
@@ -15,7 +35,7 @@ resource "aws_ec2_instance_connect_endpoint" "this" {
 resource "aws_security_group" "vpc_endpoint" {
   count = length(var.vpc_endpoint_interfaces_to_enable) > 0 ? 1 : 0
 
-  name        = "VPC-Endpoint"
+  name        = "${var.vpc_name}-vpc-endpoint-sg"
   description = "Rules for VPC endpoint traffic"
   vpc_id      = aws_vpc.this.id
 

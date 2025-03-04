@@ -44,11 +44,11 @@ resource "aws_eip" "nat" {
 
 # Hourly fee applies to NAT gateways. See https://aws.amazon.com/vpc/pricing/.
 resource "aws_nat_gateway" "this" {
-  count         = var.private_subnets_enabled && var.create_nat_gateway ? var.availability_zone_count : 0
+  count = var.private_subnets_enabled && var.create_nat_gateway ? var.availability_zone_count : 0
 
   allocation_id = element(aws_eip.nat[*].id, count.index)
   subnet_id     = element(aws_subnet.public[*].id, count.index)
-  depends_on = [aws_internet_gateway.this]
+  depends_on    = [aws_internet_gateway.this]
 }
 
 #===============================================================================
@@ -56,7 +56,7 @@ resource "aws_nat_gateway" "this" {
 # Creating public and private subnets across multiple AZs
 #===============================================================================
 resource "aws_subnet" "public" {
-  count                   = var.availability_zone_count
+  count = var.availability_zone_count
 
   vpc_id                  = aws_vpc.this.id
   availability_zone       = local.zone_names[count.index]
@@ -65,11 +65,11 @@ resource "aws_subnet" "public" {
 }
 
 resource "aws_subnet" "private" {
-  count                   = var.private_subnets_enabled ? var.availability_zone_count : 0
+  count = var.private_subnets_enabled ? var.availability_zone_count : 0
 
   vpc_id                  = aws_vpc.this.id
   availability_zone       = local.zone_names[count.index]
-  cidr_block             = cidrsubnet(var.cidr_block, 8, 100 + count.index)
+  cidr_block              = cidrsubnet(var.cidr_block, 8, 100 + count.index)
   map_public_ip_on_launch = false
 }
 
@@ -87,13 +87,13 @@ resource "aws_default_route_table" "default" {
 }
 
 resource "aws_route_table" "private" {
-  count  = var.private_subnets_enabled ? var.availability_zone_count : 0
+  count = var.private_subnets_enabled ? var.availability_zone_count : 0
 
   vpc_id = aws_vpc.this.id
 }
 
 resource "aws_route" "private_nat_gateway" {
-  count                  = var.create_nat_gateway && var.private_subnets_enabled ? var.availability_zone_count : 0
+  count = var.create_nat_gateway && var.private_subnets_enabled ? var.availability_zone_count : 0
 
   route_table_id         = element(aws_route_table.private[*].id, count.index)
   nat_gateway_id         = element(aws_nat_gateway.this[*].id, count.index)
@@ -102,14 +102,14 @@ resource "aws_route" "private_nat_gateway" {
 
 # Route table associations with subnets #
 resource "aws_route_table_association" "public" {
-  count          = var.availability_zone_count
+  count = var.availability_zone_count
 
   subnet_id      = aws_subnet.public[count.index].id
   route_table_id = aws_default_route_table.default.id
 }
 
 resource "aws_route_table_association" "private" {
-  count          = var.private_subnets_enabled ? var.availability_zone_count : 0
+  count = var.private_subnets_enabled ? var.availability_zone_count : 0
 
   subnet_id      = aws_subnet.private[count.index].id
   route_table_id = element(aws_route_table.private[*].id, count.index)

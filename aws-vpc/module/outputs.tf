@@ -41,6 +41,11 @@ output "private_subnet_cidrs" {
   value       = var.private_subnets_enabled ? aws_subnet.private[*].cidr_block : []
 }
 
+output "availability_zones" {
+  description = "List of availability zones used by this VPC"
+  value       = slice(local.zone_names, 0, var.availability_zone_count)
+}
+
 #===============================================================================
 # ROUTE TABLES
 #===============================================================================
@@ -104,4 +109,23 @@ output "vpc_endpoint_gateway_ids" {
 output "flow_log_cloudwatch_group_name" {
   description = "Name of the CloudWatch Log Group for VPC Flow Logs. Null if CloudWatch logging is disabled"
   value       = try(aws_cloudwatch_log_group.vpc_flow_log[0].name, null)
+}
+
+output "flow_log_cloudwatch_arn" {
+  description = "ARN of the CloudWatch Log Group for VPC Flow Logs. Null if CloudWatch logging is disabled"
+  value       = try(aws_cloudwatch_log_group.vpc_flow_log[0].arn, null)
+}
+
+#===============================================================================
+# KMS KEY
+#===============================================================================
+
+output "flow_log_kms_key_arn" {
+  description = "ARN of the KMS key used to encrypt VPC Flow Logs in CloudWatch. Null if encryption is disabled or an external key is used."
+  value       = try(aws_kms_key.cloudwatch_logs[0].arn, null)
+}
+
+output "flow_log_kms_key_id" {
+  description = "ID of the KMS key used to encrypt VPC Flow Logs in CloudWatch. Null if encryption is disabled or an external key is used."
+  value       = try(aws_kms_key.cloudwatch_logs[0].key_id, null)
 }

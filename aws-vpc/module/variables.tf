@@ -1,7 +1,7 @@
-# ---------------------------------------------------------------------------------------------------------------------
+#===============================================================================
 # REQUIRED VARIABLES
 # These variables must be provided by the module user
-# ---------------------------------------------------------------------------------------------------------------------
+#===============================================================================
 
 variable "vpc_name" {
   description = "Name of the VPC and prefix used for associated resources. This should be a business-meaningful name like 'prod' or 'dev-team1'"
@@ -18,10 +18,10 @@ variable "cidr_block" {
   }
 }
 
-# ---------------------------------------------------------------------------------------------------------------------
+#===============================================================================
 # OPTIONAL VARIABLES WITH DEFAULTS
 # These variables have reasonable defaults for most use cases
-# ---------------------------------------------------------------------------------------------------------------------
+#===============================================================================
 
 variable "environment" {
   description = "Environment name for tagging and resource naming. Examples: dev, staging, prod"
@@ -69,29 +69,41 @@ variable "create_eic_endpoint" {
   default     = false
 }
 
-# ---------------------------------------------------------------------------------------------------------------------
+#===============================================================================
 # FLOW LOGS CONFIGURATION
 # Variables controlling VPC Flow Logs setup
-# ---------------------------------------------------------------------------------------------------------------------
+#===============================================================================
 
 variable "flow_log_config" {
   description = "Configuration for VPC Flow Logs. Specify destinations and other settings"
   type = object({
-    cw_logs_destination_enabled = bool
-    s3_destination_enabled      = bool
-    s3_bucket_arn              = string
+    cw_logs_destination_enabled     = bool
+    cw_logs_retention_days          = optional(number, 365)
+    cw_logs_kms_key_arn             = optional(string)
+    create_kms_key                  = optional(bool, true)
+    kms_key_deletion_window_in_days = optional(number, 7)
+    s3_destination_enabled          = bool
+    s3_bucket_arn                   = optional(string)
   })
   default = {
-    cw_logs_destination_enabled = false
-    s3_destination_enabled      = false
-    s3_bucket_arn              = null
+    cw_logs_destination_enabled     = false
+    cw_logs_retention_days          = 365
+    cw_logs_kms_key_arn             = null
+    create_kms_key                  = true
+    kms_key_deletion_window_in_days = 7
+    s3_destination_enabled          = false
+    s3_bucket_arn                   = null
+  }
+
+  validation {
+    condition     = !var.flow_log_config.s3_destination_enabled || var.flow_log_config.s3_bucket_arn != null
+    error_message = "s3_bucket_arn must be provided when s3_destination_enabled is true."
   }
 }
-
-# ---------------------------------------------------------------------------------------------------------------------
+#===============================================================================
 # VPC ENDPOINTS CONFIGURATION
 # Variables controlling which VPC endpoints to create
-# ---------------------------------------------------------------------------------------------------------------------
+#===============================================================================
 
 variable "vpc_endpoint_interfaces_to_enable" {
   description = "List of AWS service names for Interface VPC Endpoints (e.g., ssm, ec2messages). These incur hourly charges"
@@ -102,5 +114,5 @@ variable "vpc_endpoint_interfaces_to_enable" {
 variable "vpc_endpoint_gateways_to_enable" {
   description = "List of AWS service names for Gateway VPC Endpoints (s3, dynamodb). These are free but need route table entries"
   type        = list(string)
-  default     = []
+  default     = ["s3"]
 }

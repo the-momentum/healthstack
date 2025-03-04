@@ -3,11 +3,12 @@
 #===============================================================================
 
 resource "aws_cloudwatch_log_group" "vpc_flow_log" {
-  count             = try(var.flow_log_config.cw_logs_destination_enabled, false) ? 1 : 0
+  count = try(var.flow_log_config.cw_logs_destination_enabled, false) ? 1 : 0
 
-  name              = "/vpc/${aws_vpc.this.id}"
+  name              = "/vpc/${var.vpc_name}/${aws_vpc.this.id}"
   log_group_class   = "STANDARD"
-  retention_in_days = 365
+  retention_in_days = var.flow_log_config.cw_logs_retention_days
+  kms_key_id        = var.flow_log_config.cw_logs_kms_key_arn != null ? var.flow_log_config.cw_logs_kms_key_arn : (var.flow_log_config.create_kms_key ? aws_kms_key.cloudwatch_logs[0].arn : null)
 }
 
 data "aws_iam_policy_document" "flow_logs_publisher_assume_role_policy" {
@@ -21,10 +22,11 @@ data "aws_iam_policy_document" "flow_logs_publisher_assume_role_policy" {
 }
 
 resource "aws_iam_role" "flow_logs_publisher" {
-  count              = try(var.flow_log_config.cw_logs_destination_enabled, false) ? 1 : 0
+  count = try(var.flow_log_config.cw_logs_destination_enabled, false) ? 1 : 0
 
-  name_prefix        = "vpc-flow-logs-role-"
+  name_prefix        = "${var.vpc_name}-vpc-flow-logs-role-"
   assume_role_policy = data.aws_iam_policy_document.flow_logs_publisher_assume_role_policy.json
+
 }
 
 data "aws_iam_policy_document" "flow_logs_publish_policy" {
@@ -42,7 +44,7 @@ data "aws_iam_policy_document" "flow_logs_publish_policy" {
 
 resource "aws_iam_role_policy" "flow_logs_publish_policy" {
   count       = try(var.flow_log_config.cw_logs_destination_enabled, false) ? 1 : 0
-  name_prefix = "vpc-flow-logs-policy-"
+  name_prefix = "${var.vpc_name}-vpc-flow-logs-policy-"
   role        = aws_iam_role.flow_logs_publisher[0].id
   policy      = data.aws_iam_policy_document.flow_logs_publish_policy.json
 }
