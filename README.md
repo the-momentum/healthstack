@@ -30,7 +30,7 @@
 | **[AWS KMS](./aws-kms)** | Key Management Service for data encryption and key rotation | ✅ Available |
 | **[AWS VPN](./aws-vpn)** | Secure VPN connection with multi-factor authentication | ✅ Available |
 | **[AWS CloudTrail & CloudWatch](./aws-audit)** | Comprehensive audit logging, monitoring and alerting | ✅ Available |
-| **AWS VPC** | Multi-AZ VPC with public/private subnets, flow logs, and VPC endpoints | 🔜 Coming Soon |
+| **[AWS VPC](./aws-vpc/)** | Multi-AZ VPC with public/private subnets, flow logs, and VPC endpoints | ✅ Available |
 | **AWS Bedrock** | AI agents and machine learning with guardrails | 🔜 Coming Soon |
 | **AWS RDS** | Managed databases with encryption and backup | 🔜 Coming Soon |
 | **AWS Backup** | Automated backup and disaster recovery | 🔜 Coming Soon |
