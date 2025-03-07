@@ -33,6 +33,7 @@
 | **[AWS VPC](./aws-vpc/)** | Multi-AZ VPC with public/private subnets, flow logs, and VPC endpoints | ✅ Available |
 | **AWS Bedrock** | AI agents and machine learning with guardrails | 🔜 Coming Soon |
 | **AWS RDS** | Managed databases with encryption and backup | 🔜 Coming Soon |
+| **AWS GuardDuty** | Threat detection service | 🔜 Coming Soon |
 | **AWS Backup** | Automated backup and disaster recovery | 🔜 Coming Soon |
 
 ## 🚀 Quick Start
