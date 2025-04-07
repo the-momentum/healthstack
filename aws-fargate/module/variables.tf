@@ -31,7 +31,6 @@ variable "cluster_arn" {
   default     = ""
 }
 
-
 variable "enable_container_insights" {
   description = "Whether to enable CloudWatch Container Insights for the ECS cluster"
   type        = bool
@@ -46,6 +45,7 @@ variable "services" {
     container_name                  = string
     container_image                 = string
     container_port                  = optional(number)
+    task_role_arn                   = string
     task_cpu                        = string
     task_memory                     = string
     environment_variables           = list(map(string))
