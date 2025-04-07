@@ -81,14 +81,11 @@ We welcome contributions from the healthcare and security communities! Here's ho
 4. Push to the branch (`git push origin feature/amazing-enhancement`)
 5. Open a Pull Request
 
-Please review our [contribution guidelines](CONTRIBUTING.md) before submitting changes.
-
 ## 🙋‍♀️ Support
 
 - **Documentation**: Review the detailed README in each module directory
 - **Issues**: Open an issue for bug reports or feature requests
 - **Direct Support**: Contact us at [hello@themomentum.ai](mailto:hello@themomentum.ai) for personalized assistance
-- **Office Hours**: Join our monthly virtual office hours (schedule on our website)
 
 ## 👨‍💻 Contributors
 
