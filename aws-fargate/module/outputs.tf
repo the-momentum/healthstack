@@ -1,0 +1,27 @@
+output "cluster_arn" {
+  description = "The ARN of the ECS cluster"
+  value       = var.create_cluster ? aws_ecs_cluster.this[0].arn : var.cluster_arn
+}
+
+output "execution_role_arn" {
+  description = "The ARN of the IAM role used for ECS task execution"
+  value       = aws_iam_role.execution.arn
+}
+
+output "task_definition_arns" {
+  description = "Map of task definition ARNs by service name"
+  value       = { for name, td in aws_ecs_task_definition.service : name => td.arn }
+}
+
+output "services" {
+  description = "Map of service details by service name"
+  value = { for name, svc in aws_ecs_service.service : name => {
+    id   = svc.id
+    name = svc.name
+  } }
+}
+
+output "log_group_arns" {
+  description = "Map of CloudWatch Log Group ARNs by service name"
+  value       = { for name, lg in aws_cloudwatch_log_group.service : name => lg.arn }
+}

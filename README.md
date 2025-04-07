@@ -31,6 +31,7 @@
 | **[AWS VPN](./aws-vpn)** | Secure VPN connection with multi-factor authentication | ✅ Available |
 | **[AWS CloudTrail & CloudWatch](./aws-audit)** | Comprehensive audit logging, monitoring and alerting | ✅ Available |
 | **[AWS VPC](./aws-vpc/)** | Multi-AZ VPC with public/private subnets, flow logs, and VPC endpoints | ✅ Available |
+| **[AWS Fargate](./aws-fargate)** | Serverless compute with auto-scaling and health checks | ✅ Available |
 | **AWS Bedrock** | AI agents and machine learning with guardrails | 🔜 Coming Soon |
 | **AWS RDS** | Managed databases with encryption and backup | 🔜 Coming Soon |
 | **AWS GuardDuty** | Threat detection service | 🔜 Coming Soon |
