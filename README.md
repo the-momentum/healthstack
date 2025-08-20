@@ -87,18 +87,13 @@ We welcome contributions from the healthcare and security communities! Here's ho
 - **Issues**: Open an issue for bug reports or feature requests
 - **Direct Support**: Contact us at [hello@themomentum.ai](mailto:hello@themomentum.ai) for personalized assistance
 
-## 👨‍💻 Contributors
-
+## 👨‍💻 Contributors - Built with ❤️ by Momentum
 <a href="https://github.com/TheMomentumAI/healthstack/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=TheMomentumAI/healthstack" />
 </a>
-
 ## 📄 License
-
 HealthStack is available under the [MIT License](LICENSE).
-
 ---
-
 <div align="center">
-  <p><em>Built with ❤️ by <a href="https://themomentum.ai">Momentum</a> • Helping healthcare innovate with confidence</em></p>
+  <p><em>Helping healthcare innovate with confidence</em></p>
 </div>
