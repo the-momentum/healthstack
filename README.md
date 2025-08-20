@@ -91,9 +91,13 @@ We welcome contributions from the healthcare and security communities! Here's ho
 <a href="https://github.com/TheMomentumAI/healthstack/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=TheMomentumAI/healthstack" />
 </a>
+
+
 ## 📄 License
 HealthStack is available under the [MIT License](LICENSE).
+
 ---
+
 <div align="center">
   <p><em>Helping healthcare innovate with confidence</em></p>
 </div>
