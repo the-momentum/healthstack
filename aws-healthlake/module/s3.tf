@@ -62,6 +62,8 @@ resource "aws_s3_bucket_policy" "data" {
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
+      # HIPAA §164.312(e) — Transmission Security / Encryption: deny access
+      # over plaintext HTTP or outdated TLS.
       {
         Sid       = "DenyInsecureTransport"
         Effect    = "Deny"
@@ -74,6 +76,21 @@ resource "aws_s3_bucket_policy" "data" {
         Condition = {
           Bool = {
             "aws:SecureTransport" = "false"
+          }
+        }
+      },
+      {
+        Sid       = "DenyOutdatedTLS"
+        Effect    = "Deny"
+        Principal = "*"
+        Action    = "s3:*"
+        Resource = [
+          "${aws_s3_bucket.data.arn}",
+          "${aws_s3_bucket.data.arn}/*"
+        ]
+        Condition = {
+          NumericLessThan = {
+            "s3:TlsVersion" = "1.2"
           }
         }
       }
