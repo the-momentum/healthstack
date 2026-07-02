@@ -193,6 +193,38 @@ resource "aws_s3_bucket_policy" "this" {
         Condition = {
           StringEquals = { "s3:x-amz-acl" = "bucket-owner-full-control" }
         }
+      },
+      # HIPAA §164.312(e) — Transmission Security / Encryption: deny access
+      # over plaintext HTTP or outdated TLS.
+      {
+        Sid       = "DenyInsecureTransport"
+        Effect    = "Deny"
+        Principal = "*"
+        Action    = "s3:*"
+        Resource = [
+          "${aws_s3_bucket.this.arn}",
+          "${aws_s3_bucket.this.arn}/*"
+        ]
+        Condition = {
+          Bool = {
+            "aws:SecureTransport" = "false"
+          }
+        }
+      },
+      {
+        Sid       = "DenyOutdatedTLS"
+        Effect    = "Deny"
+        Principal = "*"
+        Action    = "s3:*"
+        Resource = [
+          "${aws_s3_bucket.this.arn}",
+          "${aws_s3_bucket.this.arn}/*"
+        ]
+        Condition = {
+          NumericLessThan = {
+            "s3:TlsVersion" = "1.2"
+          }
+        }
       }
     ]
   })
